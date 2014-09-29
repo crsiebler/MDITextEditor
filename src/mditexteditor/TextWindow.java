@@ -2,7 +2,8 @@
 // Name: Cory Siebler
 // StudentID: 1000832292
 // Lecture Topic: 5 - GUI Components
-// Description: 
+// Description: Menu Item for each Text Editor created by the user. Has an
+//              index field to keep track of its position in the ArrayList.
 package mditexteditor;
 
 import javax.swing.JMenuItem;

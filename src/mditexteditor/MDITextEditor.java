@@ -2,7 +2,12 @@
 // Name: Cory Siebler
 // StudentID: 1000832292
 // Lecture Topic: 5 - GUI Components
-// Description: 
+// Description: The main class of the Multiple Document Interface Text Editor.
+//              Creates a tabbed pane with a JMenu to perform actions. These
+//              actions include creating a new file to edit, closing the current
+//              file, and exiting the program. In addition to the file
+//              operations, there will be a menu to change font and a menu to
+//              change the current window.
 package mditexteditor;
 
 import java.awt.Color;

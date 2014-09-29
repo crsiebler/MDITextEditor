@@ -2,7 +2,10 @@
 // Name: Cory Siebler
 // StudentID: 1000832292
 // Lecture Topic: 5 - GUI Components
-// Description: 
+// Description: Holds the Menu Items for the MDI Text Editor in a Menu Bar.
+//              Each Menu Item has a corresponding logic path in the action
+//              listener. Also, the window menu must be accessible externally
+//              from this class so it has getters to do such.
 package mditexteditor;
 
 import java.awt.event.ActionListener;

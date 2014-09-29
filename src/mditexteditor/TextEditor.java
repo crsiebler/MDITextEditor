@@ -2,7 +2,10 @@
 // Name: Cory Siebler
 // StudentID: 1000832292
 // Lecture Topic: 5 - GUI Components
-// Description: 
+// Description: The class to hold the logic for editting the text file. Consists
+//              of a TextArea inside a JPanel. Has an index field to keep track
+//              of its position in the ArrayList. Also, has a public methods to
+//              modify the font for the editor.
 package mditexteditor;
 
 import java.awt.Color;
@@ -41,10 +44,10 @@ public class TextEditor extends JPanel {
         
         // Set the size of the frame to the current screen resolution
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        
-        screenSize.setSize(screenSize.getWidth() - 25, screenSize.getHeight() - 120);
-        
-        
+        screenSize.setSize(
+                screenSize.getWidth() - 25,
+                screenSize.getHeight() - 120
+        );
         textArea.setPreferredSize(screenSize);
         
         // Set the Index of the Text Editor to the parameter given

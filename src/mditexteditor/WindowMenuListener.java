@@ -2,7 +2,7 @@
 // Name: Cory Siebler
 // StudentID: 1000832292
 // Lecture Topic: 5 - GUI Components
-// Description: 
+// Description: The action listener for the window menu items.
 package mditexteditor;
 
 import java.awt.event.ActionEvent;
@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JTabbedPane;
 
 /**
+ * Action Listener for the window menu items.
  *
  * @author csiebler
  */

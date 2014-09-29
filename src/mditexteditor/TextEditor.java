@@ -6,10 +6,11 @@
 package mditexteditor;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.TextArea;
+import java.awt.Toolkit;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 /**
  * Text Area to edit the files.
@@ -21,6 +22,7 @@ public class TextEditor extends JPanel {
     // Declare the Text Area to edit the file
     private final TextArea textArea;
     
+    // Declare the Position of the Text Editor in the ArrayList
     private int index;
     
     // Initialize the Font Variables
@@ -37,24 +39,23 @@ public class TextEditor extends JPanel {
         // Initialize a Text Area to edit text
         textArea = new TextArea();
         
+        // Set the size of the frame to the current screen resolution
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        
+        screenSize.setSize(screenSize.getWidth() - 25, screenSize.getHeight() - 120);
+        
+        
+        textArea.setPreferredSize(screenSize);
+        
         // Set the Index of the Text Editor to the parameter given
         this.index = index;
-
-        // Initialize a Scroll Pane to hold the Text Area
-        JScrollPane scrollPane = new JScrollPane(textArea);
         
-        // Set up the Scroll Pane for Scrolling
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        
-        // Allow the user to edit the Text Area
+        // Set the Text Area properties
         textArea.setEditable(true);
         
-        // Add the Scroll Pane
-        add(scrollPane);
+        // Add the Text Area to the Panel
+        add(textArea);
         
-        // Make the JPanel 
-        setVisible(true);
     }
     
     /**
@@ -62,15 +63,22 @@ public class TextEditor extends JPanel {
      * foreground color.
      */
     public void loadFont() {
-        textArea.setFont(new Font("Serif", fontType, fontSize));
+        textArea.setFont(new Font("Arial", fontType, fontSize));
         textArea.setForeground(fontColor);
     }
 
     /**
-     * @return Index of the Text Editor in the Array
+     * @return Index of the Text Editor in the ArrayList
      */
     public int getIndex() {
         return index;
+    }
+
+    /**
+     * @param index Index of the Text Editor in the ArrayList
+     */
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     /**

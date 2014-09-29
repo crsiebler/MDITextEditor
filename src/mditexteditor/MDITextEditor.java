@@ -11,8 +11,11 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JFrame;
-import javax.swing.JMenuItem;
+import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
 
 /**
  * Requirements:
@@ -34,10 +37,13 @@ public class MDITextEditor extends JFrame implements ActionListener {
     // Declare the count of Text Editors open
     private int editorCount;
     
+    // Declare the Tabbed Pane to hold the Text Editors
+    private final JTabbedPane tabbedPane;
+    
     // Declare the list of Text Editors & The Menu Bar
     private final MainMenu mainMenu;
-    private final TextEditor[] textEditors;
-    private final JMenuItem[] textWindows;
+    private final List<TextEditor> textEditors;
+    private final List<TextWindow> textWindows;
     private TextEditor currentEditor;
 
     /**
@@ -49,20 +55,41 @@ public class MDITextEditor extends JFrame implements ActionListener {
         
         // Set the size of the frame to the current screen resolution
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setSize(screenSize.width, screenSize.height - 50);
+        setSize(screenSize.width, screenSize.height);
         
         // Set the Text Editor count to 0
         editorCount = 0;
         
         // Initialize the Text Windows & Text Editor List
-        textWindows = new JMenuItem[MAX_WINDOWS];
-        textEditors = new TextEditor[MAX_WINDOWS];
+        textWindows = new ArrayList<>();
+        textEditors = new ArrayList<>();
         
         // Initialize the Menu Bar
         mainMenu = new MainMenu(this);
         
+        // Initialize the Tabbed Pane
+        tabbedPane = new JTabbedPane();
+        
+        // Add a listener to the Tabbed Pane
+        tabbedPane.addChangeListener((ChangeEvent e) -> {
+            // Grab the selected index
+            int index = tabbedPane.getSelectedIndex();
+            
+            // Make sure a Tab is selected
+            if (index < 0) {
+                // No tab selected so set the current editor to null
+                currentEditor = null;
+            } else {
+                // Set the current editor to the proper file
+                currentEditor = textEditors.get(tabbedPane.getSelectedIndex());
+            }
+        });
+        
         // Set the Menu Bar for the Frame
         setJMenuBar(mainMenu);
+        
+        // Add the Tabbed Pane to the Frame
+        add(tabbedPane);
     }
     
     /**
@@ -85,39 +112,51 @@ public class MDITextEditor extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "New":
+                // Create a new file
                 newFile();
                 break;
             case "Close":
+                // Close the current file
                 closeFile();
                 break;
             case "Exit":
+                // Exit the program
                 exitProgram();
                 break;
             case "Bold":
+                // Change the font to Bold
                 fontBold();
                 break;
             case "Italic":
+                // Change the font to Italic
                 fontItalic();
                 break;
             case "Regular":
+                // Change the font to Regular
                 fontRegular();
                 break;
             case "10":
+                // Change the font size to 10
                 size10();
                 break;
             case "12":
+                // Change the font size to 12
                 size12();
                 break;
             case "14":
+                // Change the font size to 14
                 size14();
                 break;
             case "Blue":
+                // Change the font color to Blue
                 colorBlue();
                 break;
             case "Red":
+                // Change the font color to Red
                 colorRed();
                 break;
             case "Black":
+                // Change the font color to Black
                 colorBlack();
                 break;
             default:
@@ -129,17 +168,39 @@ public class MDITextEditor extends JFrame implements ActionListener {
      * Generates a new file and adds a menu item to the Window section.
      */
     private void newFile() {
+        // Grab the index for the Text Editor
+        int index = textEditors.size();
+        
         // Check if the limit on windows has been met
-        if (textWindows.length < MAX_WINDOWS) {
-            // Grab the Index to put the Text Editor into
-            int index = editorCount % MAX_WINDOWS;
-
-            // Initialize a new Text Editor
+        if (index < MAX_WINDOWS) {
+            // Increment the Editor Count
+            editorCount++;
+            
+            // Initialize a new Text Editor & Text Window
             TextEditor textEditor = new TextEditor(index);
+            TextWindow textWindow = new TextWindow(editorCount, index);
+            
+            // Add a Listener for the Text Window
+            textWindow.addActionListener(
+                    new WindowMenuListener(textWindow, tabbedPane)
+            );
             
             // Add the Text Editor to the Array of Windows
-            textWindows[index] = new JMenuItem("Text " + index);
-            textEditors[index] = textEditor;
+            textWindows.add(textWindow);
+            textEditors.add(textEditor);
+            
+            // Add the Text Window into the Window Menu
+            mainMenu.getWindowMenu().add(textWindow);
+            
+            // Change the current editor to the new file
+            currentEditor = textEditor;
+            
+            // Load the Default font for the new Text Editor
+            currentEditor.loadFont();
+            
+            // Add the new Text Editor to the Tabbed Pane
+            tabbedPane.add("File " + editorCount, currentEditor);
+            tabbedPane.setSelectedIndex(index);
         }
     }
 
@@ -147,15 +208,29 @@ public class MDITextEditor extends JFrame implements ActionListener {
      * Closes the currently open file.
      */
     private void closeFile() {
-        // Grab the Index of the current Text Editor
+        // Grab the Index of the current Text Editor & the Size of the Editors
         int index = currentEditor.getIndex();
+        int size = textEditors.size();
         
         // Remove the current Text Editor from the Window Menu and the Array
-        textWindows[index] = null;
-        textEditors[index] = null;
+        textWindows.remove(index);
+        textEditors.remove(index);
         
-        // Set the Current Text Editor to Null
-        currentEditor = null;
+        // Remove the current Text Editor from the Tabbed Pane
+        tabbedPane.remove(index);
+        
+        // Grab the previous Text Editor if available
+        if (size > 1) {
+            // Calculate the previous index
+            int previous = size - 2;
+            
+            // Set the Current Text Editor to the previous file
+            currentEditor = textEditors.get(previous);
+            tabbedPane.setSelectedIndex(previous);
+        } else {
+            // No Editor is available
+            currentEditor = null;
+        }
         
         // Refresh the Windows
         updateWindowMenu();
@@ -258,8 +333,22 @@ public class MDITextEditor extends JFrame implements ActionListener {
         }
     }
 
+    /**
+     * For each Text Editor, updated the Menu Item and index in the ArrayLists.
+     */
     private void updateWindowMenu() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // Remove all Text Windows from the List
+        mainMenu.getWindowMenu().removeAll();
+        
+        // Loop through all the Text Editors and Add them to the Menu Bar
+        for (int i = 0; i < textWindows.size(); ++i) {
+            // Update the Index for the Text Editors
+            textWindows.get(i).setIndex(i);
+            textEditors.get(i).setIndex(i);
+            
+            // Add the Text Windows to the Window Menu
+            mainMenu.getWindowMenu().add(textWindows.get(i));
+        }
     }
     
 }
